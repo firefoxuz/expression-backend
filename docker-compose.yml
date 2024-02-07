@@ -1,6 +1,17 @@
 version: '3.9'
 
 services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - expression-network
   postgres:
     image: postgres:15-alpine
     ports:
@@ -11,3 +22,7 @@ services:
       - POSTGRES_USER=expression_user
       - POSTGRES_PASSWORD=expression_password
       - POSTGRES_DB=expression_db
+    networks:
+      - expression-network
+networks:
+  expression-network:
