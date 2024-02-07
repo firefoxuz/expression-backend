@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - /data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=expression_user
+      - POSTGRES_PASSWORD=expression_password
+      - POSTGRES_DB=expression_db
