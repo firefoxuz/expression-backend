@@ -1,9 +1,8 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
-	"expression-backend/internal/app/services"
-	"fmt"
+	"expression-backend/internal/services"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -15,24 +14,43 @@ type Expression struct {
 }
 
 func StoreExpression(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Add("Content-Type", "application/json")
 	body, err := ioutil.ReadAll(request.Body)
 
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("something went wrong"))
+		r := services.NewResponse(true, "something went wrong", nil)
+		b, _ := r.ToJsonBytes()
+		writer.Write(b)
 	}
 
 	exp := Expression{}
 
-	json.Unmarshal(body, &exp)
+	err = json.Unmarshal(body, &exp)
+
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		r := services.NewResponse(true, "something went wrong", nil)
+		b, _ := r.ToJsonBytes()
+		writer.Write(b)
+	}
 
 	validate := validator.New(validator.WithRequiredStructEnabled())
 
-	err = validate.Struct(exp)
+	if err = validate.Struct(exp); err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		r := services.NewResponse(true, "expression is not presented", nil)
+		b, _ := r.ToJsonBytes()
+		writer.Write(b)
+	}
 
-	fmt.Println(err)
-	fmt.Println(exp.Exp)
-	fmt.Println(services.IsValidMathExpression(exp.Exp))
+	if !services.IsValidExpression(exp.Exp) {
+		writer.WriteHeader(http.StatusBadRequest)
+		r := services.NewResponse(true, "expression is not valid", nil)
+		b, _ := r.ToJsonBytes()
+		writer.Write(b)
+	}
+
 }
 
 func GetExpressions(writer http.ResponseWriter, request *http.Request) {
