@@ -4,9 +4,9 @@ create table public.expressions
         constraint expressions_pk
             primary key,
     expression    text                                not null,
-    result        ,
+    result        bigint,
     is_processing boolean   default false             not null,
-    is_time_limit      boolean   default null,
+    is_time_limit boolean   default null,
     is_valid      boolean   default null,
     is_finished   boolean   default false,
     time_limit    integer   default 200               not null,

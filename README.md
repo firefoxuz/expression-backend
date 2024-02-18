@@ -76,3 +76,11 @@ Now, both the Expression Calculator Service and Expression Agent should be up an
 Below is the architecture of our microservices:
 
 ![Microservice Architecture](https://i.imgur.com/GPWQPvn.png)
+
+## Web Interface Example
+
+Below is an example of how to interact with our web:
+
+![Web Interface Example](https://i.imgur.com/XDPcoyP.png)
+
+![Web Interface Example](https://i.imgur.com/3Tr33S0.png)
