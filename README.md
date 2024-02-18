@@ -71,6 +71,18 @@ Follow these steps to set up the Expression Calculator Service and Expression Ag
 
 Now, both the Expression Calculator Service and Expression Agent should be up and running. You can access the Expression Calculator Service at [http://127.0.0.1:8082/](http://127.0.0.1:8082/) and the Expression Agent at their respective API endpoints.
 
+## Note
+
+If you want to increase the number of agents, you can do so by modifying the Docker Compose configuration of the agent service. Simply increase the value of the `deploy.replicas` setting in the `docker-compose.yml` file.
+
+For example:
+
+```yaml
+services:
+  agent:
+    deploy:
+      replicas: 2  # Change this value to increase the number of agents
+```
 ## Microservice Architecture
 
 Below is the architecture of our microservices:
