@@ -14,8 +14,7 @@ FROM alpine:latest
 
 WORKDIR /root/
 
-COPY --from=builder /app/main .
-COPY --from=builder /app/.env.json .
+COPY --from=builder /app/. .
 
 EXPOSE 8082
 

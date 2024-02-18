@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+<nav class="navbar bg-primary" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+    </div>
+</nav>
+<div class="container my-3" id="app">
+    <ul class="nav nav-tabs" id="myTab" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane"
+                    type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Calculator
+            </button>
+        </li>
+        <!--        <li class="nav-item" role="presentation">-->
+        <!--            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane"-->
+        <!--                    type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Calculation-->
+        <!--                settings-->
+        <!--            </button>-->
+        <!--        </li>-->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane"
+                    type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Computing
+                settings
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content px-4 my-5" id="myTabContent">
+        <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+             tabindex="0">
+            <div class="">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input class="w-100 p-3" type="text" v-model="expressionInput"
+                               placeholder="enter the expression to calculate">
+                    </div>
+                    <div class="col-md-2 ">
+                        <button class="btn btn-success h-100" @click="postData">Calculate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="feature">
+                <br>
+                <h5>Arithmetic Operations:</h5>
+                <p>The calculator is programmed to provide accurate results for arithmetic operations, ensuring reliability in mathematical calculations. It accepts <b> ( ) / * + - symbols and each number in expression must be positive</b></p>
+            </div>
+            <div>
+                <ul class="list-group list-group-flush" id="expressionList">
+                    <li class="list-group-item" v-for="item in expressions" :key="item.id">
+                        <i style="font-size: 20px;"
+                           :class="{ 'bi text-success bi-check-circle-fill': item.is_finished && item.is_valid && !item.is_time_limit, 'bi text-danger bi-x-circle-fill': item.is_finished && (!item.is_valid || item.is_time_limit), 'bi text-info-emphasis bi-arrow-repeat': !item.is_finished }"></i>
+                        &nbsp;<p style="color: red; display: inline-block" v-if="!item.is_valid"> Expression not
+                        valid </p>
+                        &nbsp;<p style="color: red; display: inline-block" v-else-if="item.is_time_limit"> Timelimit
+                        exceeded </p>
+                        <div v-else-if="item.is_finished" style="display: inline-block">
+                            &nbsp;<p style="color: green; display: inline-block"> Success</p>
+                            &nbsp;<p style="color: black; display: inline-block"> Result: {{item.result}}</p>
+                        </div>
+                        &nbsp;<p style="color: gray; display: inline-block" v-else="item.is_finished"> Processing</p>
+                        <br>
+                        {{item.expression}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div>
+                <form>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Oparation execution time +</label>
+                        <input class="w-100 p-3" type="text" placeholder="Oparation execution time +">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Oparation execution time +</label>
+                        <input class="w-100 p-3" type="text" placeholder="Oparation execution time +">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Oparation execution time +</label>
+                        <input class="w-100 p-3" type="text" placeholder="Oparation execution time +">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Oparation execution time +</label>
+                        <input class="w-100 p-3" type="text" placeholder="Oparation execution time +">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Oparation execution time +</label>
+                        <input class="w-100 p-3" type="text" placeholder="Oparation execution time +">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="d-flex" v-for="item in agents" :key="item.id">
+                        <div class="me-3">
+                            <i style="font-size: 50px;" :class="{'bi text-success bi-check-circle-fill': item.is_active, 'bi text-danger bi-x-circle-fill': !item.is_active}"></i>
+                        </div>
+                        <div>
+                            <h5>Computing server</h5>
+                            <p class="m-0">id {{item.id}}</p>
+                            <p class="m-0">last ping {{item.last_ping}}</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<script src="./js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<script>
+    const {createApp, ref} = Vue
+
+    createApp({
+        data() {
+            return {
+                expressions: [],
+                agents: [],
+            }
+        },
+        mounted() {
+            this.fetchData()
+
+            setInterval(this.fetchData, 3000);
+        },
+        methods: {
+            fetchData() {
+                const requestOptions = {
+                    method: "GET",
+                    redirect: "follow",
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
+
+                fetch("http://127.0.0.1:8082/expressions", requestOptions)
+                    .then((response) => response.text())
+                    .then((result) => {
+                        this.expressions = JSON.parse(result).data
+                    })
+                    .catch((error) => console.error(error));
+
+                fetch("http://127.0.0.1:8082/agents", requestOptions)
+                    .then((response) => response.text())
+                    .then((result) => {
+                        this.agents = JSON.parse(result).data
+                    })
+                    .catch((error) => console.error(error));
+            },
+            async postData() {
+                try {
+                    const response = await fetch('http://127.0.0.1:8082/expressions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            time_limit: 400,
+                            expression: this.expressionInput
+                        })
+                    });
+                    this.expressionInput = '';
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    // Optionally handle the response from the server
+                    const responseData = await response.json();
+                    console.log('Response from server:', responseData);
+
+                    // Clear the input field after successful submission
+
+                } catch (error) {
+                    console.error('Error posting data:', error);
+                }
+            }
+        }
+    }).mount('#app')
+</script>
+<script>
+
+
+</script>
+</body>
+
+</html>

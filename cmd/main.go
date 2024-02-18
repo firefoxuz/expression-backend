@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"expression-backend/api/handler"
+	"expression-backend/internal/models"
+	"expression-backend/internal/redis"
+	"expression-backend/internal/services"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -27,16 +31,15 @@ func init() {
 }
 
 func main() {
-	dbSourceName := fmt.Sprintf("host=%s dbname=%s user=%s password=%s sslmode=disable", "postgres", viper.GetString("database.name"), viper.GetString("database.username"), viper.GetString("database.password"))
-	_, err := sqlx.Connect("postgres", dbSourceName)
-	if err != nil {
-		log.Fatalln(err)
-	}
 	r := mux.NewRouter()
-
+	r.HandleFunc("/expressions/{id:[0-9]+}", handler.GetExpression).Methods(http.MethodGet)
 	r.HandleFunc("/expressions", handler.GetExpressions).Methods(http.MethodGet)
 	r.HandleFunc("/expressions", handler.StoreExpression).Methods(http.MethodPost)
-	r.HandleFunc("/expressions/{id:[0-9A-Za-z]+}", handler.GetExpression).Methods(http.MethodGet)
+	r.HandleFunc("/agents", handler.GetAgents).Methods(http.MethodGet)
+	dir := http.Dir("./assets")
+
+	fs := http.FileServer(dir)
+	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
 
 	srv := &http.Server{
 		Handler:           r,
@@ -46,5 +49,43 @@ func main() {
 	}
 
 	log.Printf("server starting at %s", srv.Addr)
+
+	go func() {
+		services.NewAgentCounters()
+		rdb, err := redis.GetConnection()
+		if err != nil {
+			panic(err)
+		}
+		pubSub := rdb.Subscribe(context.Background(), "ping_channel")
+		for {
+
+			msg, err := pubSub.ReceiveMessage(context.Background())
+			if err != nil {
+				panic(err)
+			}
+			services.AddAgent(msg.Payload, time.Now())
+			log.Println(msg.Channel, msg.Payload)
+		}
+	}()
+
+	go func() {
+		for {
+			data := models.ExpressionData{}
+			ms, _ := data.GetNotFinished()
+
+			for _, model := range *ms {
+				task := services.NewTask(rand.Int(), model.Expression, time.Duration(model.TimeLimit)*time.Millisecond)
+
+				taskResponse := task.Execute()
+				model.IsValid = taskResponse.IsValid
+				model.Result = taskResponse.Result
+				model.IsTimeLimit = taskResponse.IsTimeLimit
+				model.Update()
+			}
+
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
 	srv.ListenAndServe()
 }

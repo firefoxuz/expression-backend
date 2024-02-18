@@ -10,19 +10,34 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+      - redis
     networks:
-      - expression-network
+      - network
   postgres:
     image: postgres:15-alpine
     ports:
       - 5432:5432
     volumes:
-      - /data:/var/lib/postgresql/data
+      - expression-volume:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=expression_user
       - POSTGRES_PASSWORD=expression_password
       - POSTGRES_DB=expression_db
     networks:
-      - expression-network
+      - network
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6377:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - expression-volume:/root/redis
+    networks:
+      - network
 networks:
-  expression-network:
+  network:
+    driver: bridge
+    name: expression-network
+volumes:
+  expression-volume:
